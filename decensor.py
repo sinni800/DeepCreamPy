@@ -50,7 +50,7 @@ class Decensor:
         #load model once at beginning and reuse same model
         #self.load_model()
         color_dir = self.args.decensor_input_path
-        output_copy_path = self.args.decensor_output_path
+        output_copy_path = self.args.decensor_output_original_path
         file_names = os.listdir(color_dir)
 
         #convert all images into np arrays and put them in a list
