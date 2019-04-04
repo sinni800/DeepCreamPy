@@ -4,6 +4,7 @@ try:
     import numpy as np
     from PIL import Image
     import os
+    import time
 
     from copy import deepcopy
 
@@ -25,6 +26,9 @@ class Decensor:
 
         if not os.path.exists(self.args.decensor_output_path):
             os.makedirs(self.args.decensor_output_path)
+
+        if not os.path.exists(self.args.decensor_output_original_path):
+            os.makedirs(self.args.decensor_output_original_path)
 
         self.load_model()
 
@@ -75,10 +79,14 @@ class Decensor:
                         print("Check if it exists and is in the PNG or JPG format.")
                 else:
                     self.decensor_image(colored_img, colored_img, file_name)
+
+                    print("move " + color_file_path + " " + os.path.join(output_copy_path, file_name))
+                    os.rename(color_file_path, os.path.join(output_copy_path, file_name))
+
             elif not file_name.startswith("."): # warn if not a PNG, but ignore .gitkeep
                 print("--------------------------------------------------------------------------")
                 print("Unsupported file type (not a PNG): {}".format(color_file_path))
-        print("--------------------------------------------------------------------------")
+                os.remove(color_file_path)
 
     #decensors one image at a time
     #TODO: decensor all cropped parts of the same image in a batch (then i need input for colored an array of those images and make additional changes)
@@ -210,4 +218,15 @@ class Decensor:
 
 if __name__ == '__main__':
     decensor = Decensor()
-    decensor.decensor_all_images_in_folder()
+
+    args = config.get_args()
+
+    if args.loop:
+        try:
+            while True:
+                decensor.decensor_all_images_in_folder()
+                time.sleep(3)
+        except KeyboardInterrupt:
+            exit()
+    else:
+        decensor.decensor_all_images_in_folder()
